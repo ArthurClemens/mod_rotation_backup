@@ -65,6 +65,8 @@ Internally, archives are grouped into time buckets. When an item expires from a 
 
 ### Path
 
+**REQUIRED**
+
 The backup directory path.
 
 | Module | Key | Default value |
@@ -95,13 +97,24 @@ The default identifier is the site's host name. You can change that with key `id
 | `mod_rotation_backup` | `identifier`          | [host name]  |
 
 
+### Performance
+
+Creating a tar file from a gigabytes-sized directory can hog the server. Use a `nice` command as prefix to `tar`, for instance [ionice](https://linux.die.net/man/1/ionice). Set it as: `/usr/bin/ionice -c2 -n5`.
+
+Setting "nice" will result in slower backups, but it will no longer kill the server.
+
+| Module | Key | Default value |
+|--------|-----|-------|
+| `mod_rotation_backup` | `nice`          |   |
+
+
 ### Debug info
 
 If you are running Zotonic in debug mode, let the module write debug info to the console when set to `true`:
 
 | Module | Key | Default value |
 |--------|-----|-------|
-| `mod_rotation_backup` | `debug`          |   |
+| `mod_rotation_backup` | `debug`          | `false`  |
 
 
 

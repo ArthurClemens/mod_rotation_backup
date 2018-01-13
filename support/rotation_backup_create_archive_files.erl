@@ -19,10 +19,17 @@
 %% Returns archive path, if any.
 create(Name, TmpDir, Context) ->
     ArchiveDir = z_path:media_archive(Context),
+    NiceCmd = z_convert:to_list(m_config:get_value(
+        mod_rotation_backup,
+        nice,
+        <<"">>,
+        Context
+    )),
     case filelib:is_dir(ArchiveDir) of
         true ->
             DumpFile = filename:join([TmpDir, Name ++ ".tar.gz"]),
             Command = lists:flatten([
+                                     NiceCmd ++ " ",
                                      archive_cmd(),
                                      " -c -z ",
                                      "-f '", DumpFile, "' ",
