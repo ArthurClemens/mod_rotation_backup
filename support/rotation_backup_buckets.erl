@@ -140,21 +140,22 @@ bucket_archives(Buckets) ->
     end, [], Buckets).
     
 
-bucket_info(BucketData) ->
-  lists:map(fun(Bucket) ->
-      Key = proplists:get_value(key, Bucket),
-      StartDate = proplists:get_value(start_date, Bucket),
-      Distribution = proplists:get_value(distribution, Bucket),
-      EndDate = proplists:get_value(end_date, Bucket),
-      Count = proplists:get_value(count, Bucket),
-      CountText = case Count of
-        undefined -> "Not specified";
-        _ -> Count
-      end,
-      Archives = proplists:get_value(archives, Bucket),
-      DaySeconds = 24 * 3600,
-      [{key, Key}, {start_date, StartDate/DaySeconds}, {end_date, EndDate/DaySeconds}, {count, CountText}, {interval, Distribution/DaySeconds}, {archives, Archives}]
-  end, BucketData).
+% bucket_info(BucketData) ->
+%   lists:map(fun(Bucket) ->
+%       Key = proplists:get_value(key, Bucket),
+%       StartDate = proplists:get_value(start_date, Bucket),
+%       Distribution = proplists:get_value(distribution, Bucket),
+%       EndDate = proplists:get_value(end_date, Bucket),
+%       Count = proplists:get_value(count, Bucket),
+%       CountText = case Count of
+%         undefined -> "Not specified";
+%         _ -> Count
+%       end,
+%       Archives = proplists:get_value(archives, Bucket),
+%       DaySeconds = 24 * 3600,
+%       [{key, Key}, {start_date, StartDate/DaySeconds}, {end_date, EndDate/DaySeconds}, {count, CountText}, {interval, Distribution/DaySeconds}, {archives, Archives}]
+%   end, BucketData).
+
 
 debug(BucketData, Context) ->
     mod_rotation_backup:dev_debug("BucketData: key: start day - end day (count x interval):", Context),
