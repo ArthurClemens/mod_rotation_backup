@@ -99,9 +99,11 @@ The default identifier is the site's host name. You can change that with key `id
 
 ### Performance
 
-Creating a tar file from a gigabytes-sized directory can hog the server. Use a `nice` command as prefix to `tar`, for instance [ionice](https://linux.die.net/man/1/ionice). Set it as: `/usr/bin/ionice -c2 -n5`.
+Creating a tar file from a gigabytes-sized directory can bring the server to a standstill. By configuring a priority program, you can run `tar` with a lower priority.
 
-Setting "nice" will result in slower backups, but it will no longer kill the server.
+For example, [ionice](https://linux.die.net/man/1/ionice) is a program that sets the io scheduling class and priority for a program ([more background](https://www.askapache.com/optimize/optimize-nice-ionice/#ionice)). You can set it as: `/usr/bin/ionice -c2 -n5`.
+
+Using a low priority will result in slower backups, but the server will no longer be hogged.
 
 | Module | Key | Default value |
 |--------|-----|-------|

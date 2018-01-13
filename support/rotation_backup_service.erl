@@ -20,8 +20,12 @@
 -spec check_configuration(Context) -> list() when
     Context:: #context{}.
 check_configuration(Context) ->
-    Db = which(db_dump_cmd()),
-    Tar = which(archive_cmd()),
+    HasDatabaseDumpCmd = has_database_dump_cmd(),
+    HasCompressCmd = has_compress_cmd(),
+    HasOptionalNiceCmd = case z_convert:to_bool(nice_config_cmd(Context)) of
+        false -> true; % not configured, so fine
+        true -> has_nice_cmd(Context)
+    end,
     Dir = m_config:get_value(
         mod_rotation_backup,
         path,
@@ -29,11 +33,12 @@ check_configuration(Context) ->
     ),
     IsValidDir = filelib:is_dir(Dir),
     [
-        {ok, Db and Tar and IsValidDir},
-        {db_dump, Db},
+        {ok, HasDatabaseDumpCmd and HasCompressCmd and HasOptionalNiceCmd and IsValidDir},
+        {db_dump_cmd, HasDatabaseDumpCmd},
+        {compress_cmd, HasCompressCmd},
+        {nice_cmd, HasOptionalNiceCmd},
         {valid_dir, IsValidDir},
-        {path, Dir},
-        {archive, Tar}
+        {path, Dir}
     ].
 
 
@@ -99,17 +104,29 @@ remove(File, Context) ->
     file:delete(Path).
 
 
--spec archive_cmd() -> string().
-archive_cmd() ->
-    z_convert:to_list(z_config:get(tar, "tar")).
+nice_config_cmd(Context) ->
+    HasOptionalNiceCmd = m_config:get_value(
+        mod_rotation_backup,
+        nice,
+        Context
+    ),
+    case HasOptionalNiceCmd of
+        undefined -> undefined;
+        _ -> z_convert:to_list(HasOptionalNiceCmd)
+    end.
 
 
--spec db_dump_cmd() -> string().
-db_dump_cmd() ->
-    z_convert:to_list(z_config:get(pg_dump, "pg_dump")).
-
-
--spec which(Cmd) -> boolean() when
+-spec has_cmd(Cmd) -> boolean() when
     Cmd:: string().
-which(Cmd) ->
-    filelib:is_regular(z_string:trim_right(os:cmd("which " ++ z_utils:os_escape(Cmd)))).
+has_cmd(Cmd) when Cmd =:= undefined ->
+    false;
+has_cmd(Cmd) ->
+    case (catch rotation_backup_cmd:run(Cmd)) of
+        {commandfailed, _} -> false;
+        _ -> true
+    end.
+
+has_compress_cmd() -> has_cmd("tar --version").
+has_database_dump_cmd() -> has_cmd("pg_dump --version").
+has_nice_cmd(Context) -> has_cmd(nice_config_cmd(Context) ++ " ls").
+
