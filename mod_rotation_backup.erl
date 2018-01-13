@@ -58,9 +58,12 @@ observe_admin_menu(admin_menu, Acc, Context) ->
      |Acc].
 
 
-observe_m_config_update(#m_config_update{module=Module}, Context) ->
+observe_m_config_update(#m_config_update{module=Module}, _Context) ->
     case Module of
-        mod_rotation_backup -> start_backup(Context);
+        mod_rotation_backup ->
+            % Do nothing for now.
+            % It would be better to show the user what the implications might be.
+            ok;
         _ -> ok
     end.
 
