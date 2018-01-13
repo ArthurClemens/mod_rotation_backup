@@ -1,0 +1,12 @@
+[
+    {
+        admin_rotation_backup, 
+        ["admin", "rotation-backup"],
+        controller_admin_rotation_backup,
+        [
+            {template, "admin_rotation_backup.tpl"},
+            {acl, {use, mod_admin}}
+        ]
+    }
+].
+
